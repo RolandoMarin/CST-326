@@ -18,11 +18,5 @@ namespace CST_326.DAO
       
             return userDAO.FindUser(user);
         }
-
-        public void RegisterUser(RegistrationViewModel user)
-        {
-            // Call the method in UserDAO to insert the new user into the database
-            userDAO.RegisterUser(user);
-        }
     }
 }
