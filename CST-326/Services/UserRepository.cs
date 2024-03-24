@@ -18,5 +18,10 @@ namespace CST_326.DAO
       
             return userDAO.FindUser(user);
         }
+
+        public bool DeleteUser(User user)
+        {
+            return userDAO.DeleteUser(user);
+        }
     }
 }

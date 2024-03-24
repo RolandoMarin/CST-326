@@ -26,6 +26,11 @@ namespace CST_326.Controllers
             }
             return View("Dashboard", userRepository.GetUser(user));
         }
-
+        
+        public IActionResult Delete(User user)
+        {
+            userRepository.DeleteUser(user);
+            return RedirectToAction("Index", "Home");
+        }
     }
 }

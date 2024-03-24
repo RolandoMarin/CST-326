@@ -52,3 +52,17 @@
     @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
     <a asp-action="Index">Back to List</a>
 </div>
+<div>
+    <form id="deleteForm" method="post" asp-action="Delete">
+        <input type="hidden" asp-for="UserId" />
+        <button type="button" onclick="confirmDelete()" class="btn btn-danger">Delete Account</button>
+    </form>
+</div>
+
+<script>
+    function confirmDelete() {
+        if (confirm("Are you sure you want to delete your account?")) {
+            document.getElementById("deleteForm").submit();
+        }
+    }
+</script>

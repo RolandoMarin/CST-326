@@ -4,6 +4,7 @@ using CST_326.Models.ViewModel;
 using MySql.Data.MySqlClient;
 using NuGet.Protocol.Plugins;
 using System.Data;
+using System.Data.SqlClient;
 using System.Security.Cryptography.X509Certificates;
 
 namespace CST_326.Services
@@ -51,6 +52,30 @@ namespace CST_326.Services
             return null;
 
 
+        }
+
+        public bool DeleteUser(User user)
+        {
+            string deleteQuery = "DELETE FROM users WHERE UserId = @Id";
+
+            using (MySqlConnection connection = new MySqlConnection(myConnectionString))
+            {
+                MySqlCommand command = new MySqlCommand(deleteQuery, connection);
+                command.Parameters.AddWithValue("@id", user.UserId);
+
+                connection.Open();
+                int rowsAffected = command.ExecuteNonQuery();
+                connection.Close();
+
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
 
     }
