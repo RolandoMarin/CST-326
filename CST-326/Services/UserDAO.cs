@@ -53,5 +53,32 @@ namespace CST_326.Services
 
         }
 
+        // register a new user 
+        public void RegisterUser(RegistrationViewModel newUser)
+        {
+            string sqlStatement = "INSERT INTO users (Username, Password, FirstName, LastName, PhoneNumber) VALUES (@USERNAME, @PASSWORD, @FIRSTNAME, @LASTNAME, @PHONENUMBER)";
+
+            using (MySqlConnection connection = new MySqlConnection(myConnectionString))
+            {
+                MySqlCommand command = new MySqlCommand(sqlStatement, connection);
+
+                command.Parameters.AddWithValue("@USERNAME", newUser.UserName);
+                command.Parameters.AddWithValue("@PASSWORD", newUser.Password);
+                command.Parameters.AddWithValue("@FIRSTNAME", newUser.FirstName);
+                command.Parameters.AddWithValue("@LASTNAME", newUser.LastName);
+                command.Parameters.AddWithValue("@PHONENUMBER", newUser.PhoneNumber);
+
+                try
+                {
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                };
+            }
+        }
+
     }
 }
