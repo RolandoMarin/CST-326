@@ -4,6 +4,7 @@ using CST_326.Models.ViewModel;
 using MySql.Data.MySqlClient;
 using NuGet.Protocol.Plugins;
 using System.Data;
+using System.Data.SqlClient;
 using System.Security.Cryptography.X509Certificates;
 
 namespace CST_326.Services
@@ -51,6 +52,57 @@ namespace CST_326.Services
             return null;
 
 
+        }
+
+        public bool DeleteUser(User user)
+        {
+            string deleteQuery = "DELETE FROM users WHERE UserId = @Id";
+
+            using (MySqlConnection connection = new MySqlConnection(myConnectionString))
+            {
+                MySqlCommand command = new MySqlCommand(deleteQuery, connection);
+                command.Parameters.AddWithValue("@id", user.UserId);
+
+                connection.Open();
+                int rowsAffected = command.ExecuteNonQuery();
+                connection.Close();
+
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        // register a new user 
+        public void RegisterUser(RegistrationViewModel newUser)
+        {
+            string sqlStatement = "INSERT INTO users (Username, Password, FirstName, LastName, PhoneNumber) VALUES (@USERNAME, @PASSWORD, @FIRSTNAME, @LASTNAME, @PHONENUMBER)";
+
+            using (MySqlConnection connection = new MySqlConnection(myConnectionString))
+            {
+                MySqlCommand command = new MySqlCommand(sqlStatement, connection);
+
+                command.Parameters.AddWithValue("@USERNAME", newUser.UserName);
+                command.Parameters.AddWithValue("@PASSWORD", newUser.Password);
+                command.Parameters.AddWithValue("@FIRSTNAME", newUser.FirstName);
+                command.Parameters.AddWithValue("@LASTNAME", newUser.LastName);
+                command.Parameters.AddWithValue("@PHONENUMBER", newUser.PhoneNumber);
+
+                try
+                {
+                    connection.Open();
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                };
+            }
         }
 
     }

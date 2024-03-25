@@ -8,7 +8,7 @@ namespace CST_326.Controllers
 {
     public class AccountController : Controller
     {
-       private UserRepository userRepository;
+        private UserRepository userRepository;
         public AccountController()
         {
             userRepository = new UserRepository();
@@ -26,6 +26,13 @@ namespace CST_326.Controllers
             }
             return View("Dashboard", userRepository.GetUser(user));
         }
+
+        public IActionResult Register()
+        {
+            return View("Register");
+        }
+
+
 
     }
 }
