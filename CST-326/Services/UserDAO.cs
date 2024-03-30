@@ -6,23 +6,34 @@ using NuGet.Protocol.Plugins;
 using System.Data;
 using System.Data.SqlClient;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Cryptography;
+using System.Text;
+
+
 
 namespace CST_326.Services
 {
     public class UserDAO 
     {
         string myConnectionString = "Server=jonahmysqlserver.mysql.database.azure.com;Database=capstone;User Id=joenuh;Password=Jonah124;SslMode=Preferred;";
+
+        private string HashPassword(string password, string salt)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password + salt));
+                return Convert.ToBase64String(hashedBytes);
+            }
+        }
+
         public User FindUser(LoginViewModel user)
         {
-
-            string sqlStatement = "SELECT * FROM users WHERE Username = @USERNAME and Password = @PASSWORD";
+            string sqlStatement = "SELECT * FROM users WHERE Username = @USERNAME";
 
             using (MySqlConnection connection = new MySqlConnection(myConnectionString))
             {
                 MySqlCommand command = new MySqlCommand(sqlStatement, connection);
-
-                command.Parameters.AddWithValue("@USERNAME", user.UserName).Value = user.UserName;
-                command.Parameters.AddWithValue("@PASSWORD", user.Password).Value = user.Password;
+                command.Parameters.AddWithValue("@USERNAME", user.UserName);
 
                 try
                 {
@@ -31,17 +42,28 @@ namespace CST_326.Services
 
                     while (reader.Read())
                     {
+                        string hashedPassword = reader.GetString(2); // Assuming Password is at index 2
+                        string salt = reader.GetString(6); // Assuming Salt is at index 6
 
-                        User a = new User()
+                        if (hashedPassword == HashPassword(user.Password, salt))
                         {
-                            UserId = reader.GetInt32(0),
-                            UserName = reader.GetString(1),
-                            Password = reader.GetString(2),
-                            FirstName = reader.GetString(3),
-                            LastName = reader.GetString(4),
-                            PhoneNumber = reader.GetString(5),
-                        };
-                        return a;
+                            // Passwords match, return user
+                            User a = new User()
+                            {
+                                UserId = reader.GetInt32(0),
+                                UserName = reader.GetString(1),
+                                Password = reader.GetString(2),
+                                FirstName = reader.GetString(3),
+                                LastName = reader.GetString(4),
+                                PhoneNumber = reader.GetString(5),
+                            };
+                            return a;
+                        }
+                        else
+                        {
+                            // Passwords don't match
+                            return null;
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -50,8 +72,6 @@ namespace CST_326.Services
                 };
             }
             return null;
-
-
         }
 
         public bool DeleteUser(User user)
@@ -78,17 +98,20 @@ namespace CST_326.Services
             }
         }
 
-        // register a new user 
         public void RegisterUser(RegistrationViewModel newUser)
         {
-            string sqlStatement = "INSERT INTO users (Username, Password, FirstName, LastName, PhoneNumber) VALUES (@USERNAME, @PASSWORD, @FIRSTNAME, @LASTNAME, @PHONENUMBER)";
+            string salt = GenerateSalt();
+            string hashedPassword = HashPassword(newUser.Password, salt);
+
+            string sqlStatement = "INSERT INTO users (Username, Password, Salt, FirstName, LastName, PhoneNumber) VALUES (@USERNAME, @PASSWORD, @SALT, @FIRSTNAME, @LASTNAME, @PHONENUMBER)";
 
             using (MySqlConnection connection = new MySqlConnection(myConnectionString))
             {
                 MySqlCommand command = new MySqlCommand(sqlStatement, connection);
 
                 command.Parameters.AddWithValue("@USERNAME", newUser.UserName);
-                command.Parameters.AddWithValue("@PASSWORD", newUser.Password);
+                command.Parameters.AddWithValue("@PASSWORD", hashedPassword);
+                command.Parameters.AddWithValue("@SALT", salt);
                 command.Parameters.AddWithValue("@FIRSTNAME", newUser.FirstName);
                 command.Parameters.AddWithValue("@LASTNAME", newUser.LastName);
                 command.Parameters.AddWithValue("@PHONENUMBER", newUser.PhoneNumber);
@@ -105,5 +128,14 @@ namespace CST_326.Services
             }
         }
 
+        private string GenerateSalt()
+        {
+            byte[] salt = new byte[16];
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                rng.GetBytes(salt);
+            }
+            return Convert.ToBase64String(salt);
+        }
     }
 }

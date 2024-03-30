@@ -6,7 +6,6 @@ namespace CST_326.DAO
     {
         //CRUD Commands
          User GetUser(T user);
-         User EditUser(T user);
-
+        User EditUser(T user);
     }
 }
