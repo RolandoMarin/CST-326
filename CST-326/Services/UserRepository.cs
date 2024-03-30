@@ -4,19 +4,31 @@ using CST_326.Services;
 
 namespace CST_326.DAO
 {
-    public class UserRepository : IUserRepository<LoginViewModel>
+    public class UserRepository : IUserRepository
     {
         UserDAO userDAO = new UserDAO();
 
-        public User EditUser(LoginViewModel user)
+        public bool CreateUser(User user)
+        {
+            return userDAO.RegisterUser(user);
+        }
+
+        public bool DeleteUser(User user)
         {
             throw new NotImplementedException();
         }
 
-        public User GetUser(LoginViewModel user)
+        public User EditUser(User user)
         {
-      
+            throw new NotImplementedException();
+        }
+
+        public User GetUser(User user)
+        {
+
             return userDAO.FindUser(user);
         }
+
+
     }
 }
