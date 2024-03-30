@@ -1,6 +1,16 @@
 html {
   font-size: 14px;
 }
+footer {
+    background-color: #061621;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 2.5rem;
+}
+* {
+    font-family: Euclid Circular A;
+}
 
 @media (min-width: 768px) {
   html {
@@ -20,3 +30,17 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/*Button styling*/
+.green-btn {
+    background-color: #00684a;
+    border-color: #00684a;
+}
+    .green-btn:hover {
+        background-color: #00684a;
+        border-color: #00684a;
+        box-shadow: 0 0 0 3px #c0fae6;
+    }
+
+/*Registration Styling*/
+

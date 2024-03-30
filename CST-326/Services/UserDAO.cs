@@ -12,7 +12,7 @@ namespace CST_326.Services
     public class UserDAO 
     {
         string myConnectionString = "Server=jonahmysqlserver.mysql.database.azure.com;Database=capstone;User Id=joenuh;Password=Jonah124;SslMode=Preferred;";
-        public User FindUser(LoginViewModel user)
+        public User FindUser(User user)
         {
 
             string sqlStatement = "SELECT * FROM users WHERE Username = @USERNAME and Password = @PASSWORD";
@@ -40,6 +40,7 @@ namespace CST_326.Services
                             FirstName = reader.GetString(3),
                             LastName = reader.GetString(4),
                             PhoneNumber = reader.GetString(5),
+                            EmailAddress = reader.GetString(6),
                         };
                         return a;
                     }
@@ -79,9 +80,9 @@ namespace CST_326.Services
         }
 
         // register a new user 
-        public void RegisterUser(RegistrationViewModel newUser)
+        public bool RegisterUser(User newUser)
         {
-            string sqlStatement = "INSERT INTO users (Username, Password, FirstName, LastName, PhoneNumber) VALUES (@USERNAME, @PASSWORD, @FIRSTNAME, @LASTNAME, @PHONENUMBER)";
+            string sqlStatement = "INSERT INTO users (Username, Password, FirstName, LastName,Phone,Email) VALUES (@USERNAME,@PASSWORD,@FIRSTNAME,@LASTNAME,@PHONE,@EMAIL)";
 
             using (MySqlConnection connection = new MySqlConnection(myConnectionString))
             {
@@ -91,18 +92,28 @@ namespace CST_326.Services
                 command.Parameters.AddWithValue("@PASSWORD", newUser.Password);
                 command.Parameters.AddWithValue("@FIRSTNAME", newUser.FirstName);
                 command.Parameters.AddWithValue("@LASTNAME", newUser.LastName);
-                command.Parameters.AddWithValue("@PHONENUMBER", newUser.PhoneNumber);
+                command.Parameters.AddWithValue("@PHONE", newUser.PhoneNumber);
+                command.Parameters.AddWithValue("@EMAIL", newUser.EmailAddress);
 
                 try
                 {
                     connection.Open();
-                    command.ExecuteNonQuery();
+                    int rowsAffected = command.ExecuteNonQuery();
+                    if (rowsAffected > 0)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
                 };
             }
+            return false;
         }
 
     }

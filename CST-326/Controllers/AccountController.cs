@@ -1,38 +1,109 @@
-﻿using CST_326.DAO;
+﻿using CST_326.Business;
+using CST_326.DAO;
 using CST_326.Models;
 using CST_326.Models.ViewModel;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using MySqlX.XDevAPI;
 using System.Reflection;
+using System.Security.Claims;
+using System.Text.Json;
 
 namespace CST_326.Controllers
 {
     public class AccountController : Controller
     {
         private UserRepository userRepository;
+        private UserBusiness createUser = new UserBusiness();
         public AccountController()
         {
             userRepository = new UserRepository();
         }
 
-        public IActionResult Index()
+        [AllowAnonymous]
+        public IActionResult Login()
         {
-            return View("Login");
+            return View();
         }
-        public IActionResult ProcessLogin(LoginViewModel user)
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> ProcessLoginAsync(LoginViewModel model)
+        {
+            var claims = new List<Claim>
+                {
+                new Claim(ClaimTypes.Name, model.UserName)
+                };
+
+            var identity = new ClaimsIdentity(claims, "MyAuthenticationScheme");
+
+            var principal = new ClaimsPrincipal(identity);
+
+            await HttpContext.SignInAsync(principal);
+
+            if (ModelState.IsValid)
+            {
+                var user = userRepository.GetUser(createUser.GetUser(model));
+                if (user != null)
+                {
+                    HttpContext.Session.SetString("UserModel", JsonSerializer.Serialize(user));
+                    return RedirectToAction("Home");
+                }
+            }
+            return View("Login", model);
+
+        }
+
+        [AllowAnonymous]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public IActionResult Register(RegisterViewModel registeredUser)
         {
             if (!ModelState.IsValid)
             {
-                return View("Login");
+                return View();
             }
-            return View("Dashboard", userRepository.GetUser(user));
-        }
 
-        public IActionResult Register()
+            var user = userRepository.CreateUser(createUser.AddUser(registeredUser));
+
+            if (user)
+            {
+                return RedirectToAction("Login");
+            }
+            else
+            {
+                ModelState.AddModelError("", "Email Address is already taken");
+                return View(registeredUser);
+            }
+
+        }
+        [Authorize]
+        public IActionResult Home()
         {
-            return View("Register");
+            var userModel = JsonSerializer.Deserialize<User>(HttpContext.Session.GetString("UserModel"));
+            return View("Dashboard",userModel);
         }
 
 
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync();
+            return RedirectToAction("Login", "Account");  // Redirect to login or home page
+        }
 
     }
+
+
+
+
+
 }
