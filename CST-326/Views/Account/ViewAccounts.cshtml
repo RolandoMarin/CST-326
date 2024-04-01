@@ -1,0 +1,67 @@
+﻿@model Tuple<CST_326.Models.User, List<CST_326.Models.Account>>
+
+@{
+    ViewData["Title"] = "View";
+}
+
+<h1>View</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Item2.FirstOrDefault().AccountId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Item2.FirstOrDefault().UserId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Item2.FirstOrDefault().AccountNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Item2.FirstOrDefault().AccountType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Item2.FirstOrDefault().Balance)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Item2.FirstOrDefault().CreatedAt)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var account in Model.Item2.Where(a => a.UserId == Model.Item1.UserId))
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => account.AccountId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => account.UserId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => account.AccountNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => account.AccountType)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => account.Balance)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => account.CreatedAt)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = account.AccountId }) |
+                    @Html.ActionLink("Details", "Details", new { id = account.AccountId }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = account.AccountId })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

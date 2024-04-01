@@ -9,13 +9,18 @@
         public decimal Balance { get; set; }
         public DateTime CreatedAt { get; set; }
 
-        public Account(int userId, string accountNumber, string accountType, decimal balance)
+        public Account(int accountId, int userId, string accountNumber, string accountType, decimal balance, DateTime createdAt)
         {
+            AccountId = accountId;
             UserId = userId;
             AccountNumber = accountNumber;
             AccountType = accountType;
             Balance = balance;
-            CreatedAt = DateTime.Now;
+            CreatedAt = createdAt;
+        }
+
+        public Account()
+        {
         }
 
         // Methods to handle deposit, withdrawal, etc., could be added here

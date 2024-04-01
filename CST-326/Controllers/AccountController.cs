@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using MySqlX.XDevAPI;
 using System.Reflection;
@@ -98,6 +99,20 @@ namespace CST_326.Controllers
         {
             await HttpContext.SignOutAsync();
             return RedirectToAction("Login", "Account");  // Redirect to login or home page
+        }
+
+        public IActionResult ViewAccounts()
+        {
+            var userModel = JsonSerializer.Deserialize<User>(HttpContext.Session.GetString("UserModel"));
+
+            // Retrieve accounts associated with the user
+            var userAccounts = userRepository.GetAccounts(userModel);
+
+            // Create a tuple containing the user object and the associated accounts
+            var model = new Tuple<User, List<Account>>(userModel, userAccounts);
+
+            // Pass the tuple to the view
+            return View("ViewAccounts", model);
         }
 
     }
