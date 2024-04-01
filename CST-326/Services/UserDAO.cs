@@ -116,5 +116,45 @@ namespace CST_326.Services
             return false;
         }
 
+        public List<Account> GetAccountsByUserId(User user)
+        {
+            List<Account> accounts = new List<Account>();
+
+            string sqlStatement = "SELECT * FROM accounts WHERE UserId = @UserId";
+
+            using (MySqlConnection connection = new MySqlConnection(myConnectionString))
+            {
+                MySqlCommand command = new MySqlCommand(sqlStatement, connection);
+
+                command.Parameters.AddWithValue("@UserId", user.UserId);
+
+                try
+                {
+                    connection.Open();
+                    MySqlDataReader reader = command.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        Account account = new Account()
+                        {
+                            // Populate account properties from the database
+                            AccountId = reader.GetInt32(0),
+                            UserId = reader.GetInt32(1),
+                            AccountNumber = reader.GetString(2),
+                            AccountType = reader.GetString(3),
+                            Balance = reader.GetInt32(4),
+                            CreatedAt = reader.GetDateTime(5)
+                        };
+                        accounts.Add(account);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+
+            return accounts;
+        }
     }
 }

@@ -29,6 +29,9 @@ namespace CST_326.DAO
             return userDAO.FindUser(user);
         }
 
-
+        public List<Account> GetAccounts(User user)
+        {
+            return userDAO.GetAccountsByUserId(user);
+        }
     }
 }
