@@ -57,7 +57,10 @@
         <input type="hidden" asp-for="UserId" />
         <button type="button" onclick="confirmDelete()" class="btn btn-danger">Delete Account</button>
     </form>
+    @Html.ActionLink("View Accounts", "ViewAccounts", "Account", null, new { @class = "btn btn-primary" })
 </div>
+
+
 
 <script>
     function confirmDelete() {
